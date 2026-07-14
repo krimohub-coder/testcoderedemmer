@@ -1,58 +1,6 @@
--- KRIMO HUB
+-- KRIMO HUB - COMPLETE (ALL FEATURES)
 -- Made by momo.1711
 
--- ============================================
--- ANTI-CHEAT BYPASS (SAFE - NO ERRORS)
--- ============================================
-
--- 1. SCRIPT NAME SPOOFING (SAFE)
-pcall(function()
-    if getfenv and getfenv().script then
-        getfenv().script.Name = "System_" .. tostring(math.random(1000,9999))
-    end
-end)
-
--- 2. KICK BYPASS (SAFE)
-pcall(function()
-    local LP = game:GetService("Players").LocalPlayer
-    if LP and LP.Kick then
-        LP.Kick = function() return nil end
-    end
-end)
-
--- 3. TASK.WAIT BYPASS (SAFE)
-pcall(function()
-    local oldWait = task.wait
-    task.wait = function(t)
-        if t and t > 1 then t = 0.3 end
-        return oldWait(t or 0)
-    end
-end)
-
--- 4. RANDOM NAME GENERATOR
-local function randomName()
-    local name = ""
-    for i = 1, 10 do
-        name = name .. string.char(math.random(97, 122))
-    end
-    return name
-end
-
--- 5. GETRAWMETATABLE SAFE (NUR WENN VERFÜGBAR)
-local safeGetRawMetatable = nil
-pcall(function()
-    safeGetRawMetatable = getrawmetatable
-end)
-
--- 6. HOOKMETAMETHOD SAFE (NUR WENN VERFÜGBAR)
-local safeHookMetamethod = nil
-pcall(function()
-    safeHookMetamethod = hookmetamethod
-end)
-
--- ============================================
--- SERVICES
--- ============================================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -60,11 +8,9 @@ local RS = game:GetService("ReplicatedStorage")
 local VIM = game:GetService("VirtualInputManager")
 local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
-local PG = LP:FindFirstChild("PlayerGui") or LP:WaitForChild("PlayerGui")
+local PG = LP:WaitForChild("PlayerGui")
 
--- ============================================
 -- VARIABLEN
--- ============================================
 local box = nil
 local pickMode = false
 local enabled = true
@@ -79,19 +25,15 @@ local renderConn = nil
 local minimized = false
 local hooked = false
 
--- ============================================
--- SCHÖNE GUI MIT RANDOM NAMEN
--- ============================================
+-- GUI
 local SG = Instance.new("ScreenGui")
-SG.Name = randomName()
+SG.Name = "KrimoHub"
 SG.ResetOnSpawn = false
 SG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 SG.DisplayOrder = 999
 SG.Parent = PG
 
--- MAIN FRAME
 local FR = Instance.new("Frame")
-FR.Name = randomName()
 FR.Size = UDim2.new(0, 340, 0, 210)
 FR.Position = UDim2.new(1, -350, 0, 10)
 FR.BackgroundColor3 = Color3.fromRGB(8, 8, 16)
@@ -105,7 +47,6 @@ FRC.Parent = FR
 local FRS = Instance.new("UIStroke")
 FRS.Color = Color3.fromRGB(0, 180, 255)
 FRS.Thickness = 1.2
-FRS.Transparency = 0.3
 FRS.Parent = FR
 
 -- GLOW
@@ -124,7 +65,6 @@ end)
 
 -- MINI BUTTON (K)
 local MB = Instance.new("TextButton")
-MB.Name = randomName()
 MB.Size = UDim2.new(0, 40, 0, 40)
 MB.Position = UDim2.new(1, -50, 0, 10)
 MB.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
@@ -134,44 +74,23 @@ MB.TextSize = 22
 MB.TextColor3 = Color3.fromRGB(255, 255, 255)
 MB.Font = Enum.Font.GothamBold
 MB.Visible = false
-MB.BackgroundTransparency = 0.1
 MB.Parent = SG
 
 local MBC = Instance.new("UICorner")
 MBC.CornerRadius = UDim.new(0, 10)
 MBC.Parent = MB
 
-local MBS = Instance.new("UIStroke")
-MBS.Color = Color3.fromRGB(0, 200, 255)
-MBS.Thickness = 1.5
-MBS.Transparency = 0.3
-MBS.Parent = MB
-
 -- HEADER
 local HD = Instance.new("Frame")
-HD.Name = randomName()
 HD.Size = UDim2.new(1, 0, 0, 32)
 HD.BackgroundColor3 = Color3.fromRGB(12, 12, 22)
-HD.BorderSizePixel = 0
-HD.BackgroundTransparency = 0.05
 HD.Parent = FR
 
 local HDC = Instance.new("UICorner")
 HDC.CornerRadius = UDim.new(0, 10)
 HDC.Parent = HD
 
-local HDF = Instance.new("Frame")
-HDF.Name = randomName()
-HDF.Size = UDim2.new(1, 0, 0, 10)
-HDF.Position = UDim2.new(0, 0, 1, -10)
-HDF.BackgroundColor3 = Color3.fromRGB(8, 8, 16)
-HDF.BorderSizePixel = 0
-HDF.BackgroundTransparency = 0.05
-HDF.Parent = HD
-
--- TITLE
 local TL = Instance.new("TextLabel")
-TL.Name = randomName()
 TL.Size = UDim2.new(0, 120, 1, 0)
 TL.Position = UDim2.new(0, 10, 0, 0)
 TL.BackgroundTransparency = 1
@@ -185,7 +104,6 @@ TL.Parent = HD
 
 -- MINUS BUTTON
 local MNB = Instance.new("TextButton")
-MNB.Name = randomName()
 MNB.Size = UDim2.new(0, 22, 0, 22)
 MNB.AnchorPoint = Vector2.new(1, 0.5)
 MNB.Position = UDim2.new(1, -8, 0.5, 0)
@@ -195,22 +113,14 @@ MNB.Text = "−"
 MNB.TextSize = 16
 MNB.TextColor3 = Color3.fromRGB(255, 255, 255)
 MNB.Font = Enum.Font.GothamBold
-MNB.BackgroundTransparency = 0.05
 MNB.Parent = HD
 
 local MNBC = Instance.new("UICorner")
 MNBC.CornerRadius = UDim.new(0, 5)
 MNBC.Parent = MNB
 
-local MNBS = Instance.new("UIStroke")
-MNBS.Color = Color3.fromRGB(200, 50, 50)
-MNBS.Thickness = 1
-MNBS.Transparency = 0.3
-MNBS.Parent = MNB
-
--- ON/OFF BUTTON
+-- ON/OFF
 local OB = Instance.new("TextButton")
-OB.Name = randomName()
 OB.Size = UDim2.new(0, 40, 0, 18)
 OB.AnchorPoint = Vector2.new(1, 0.5)
 OB.Position = UDim2.new(0.9, -8, 0.5, 0)
@@ -221,45 +131,27 @@ OB.Text = "ON"
 OB.TextSize = 9
 OB.Font = Enum.Font.GothamBold
 OB.TextColor3 = Color3.fromRGB(0, 0, 0)
-OB.BackgroundTransparency = 0.05
 OB.Parent = HD
 
 local OBC = Instance.new("UICorner")
 OBC.CornerRadius = UDim.new(0, 5)
 OBC.Parent = OB
 
-local OBS = Instance.new("UIStroke")
-OBS.Color = Color3.fromRGB(60, 220, 90)
-OBS.Thickness = 1
-OBS.Transparency = 0.3
-OBS.Parent = OB
-
 -- STATUS
 local SC = Instance.new("Frame")
-SC.Name = randomName()
 SC.Size = UDim2.new(1, -16, 0, 24)
 SC.Position = UDim2.new(0, 8, 0, 38)
 SC.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
-SC.BorderSizePixel = 0
-SC.BackgroundTransparency = 0.05
 SC.Parent = FR
 
 local SCC = Instance.new("UICorner")
 SCC.CornerRadius = UDim.new(0, 6)
 SCC.Parent = SC
 
-local SCS = Instance.new("UIStroke")
-SCS.Color = Color3.fromRGB(30, 30, 50)
-SCS.Thickness = 1
-SCS.Transparency = 0.5
-SCS.Parent = SC
-
 local DOT = Instance.new("Frame")
-DOT.Name = randomName()
 DOT.Size = UDim2.new(0, 6, 0, 6)
 DOT.Position = UDim2.new(0, 8, 0.5, -3)
 DOT.BackgroundColor3 = Color3.fromRGB(80, 220, 100)
-DOT.BorderSizePixel = 0
 DOT.Parent = SC
 
 local DOTC = Instance.new("UICorner")
@@ -267,7 +159,6 @@ DOTC.CornerRadius = UDim.new(0, 3)
 DOTC.Parent = DOT
 
 local SL = Instance.new("TextLabel")
-SL.Name = randomName()
 SL.Size = UDim2.new(1, -22, 1, 0)
 SL.Position = UDim2.new(0, 18, 0, 0)
 SL.BackgroundTransparency = 1
@@ -281,26 +172,16 @@ SL.Parent = SC
 
 -- DETECTED
 local DC = Instance.new("Frame")
-DC.Name = randomName()
 DC.Size = UDim2.new(1, -16, 0, 32)
 DC.Position = UDim2.new(0, 8, 0, 66)
 DC.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
-DC.BorderSizePixel = 0
-DC.BackgroundTransparency = 0.05
 DC.Parent = FR
 
 local DCC = Instance.new("UICorner")
 DCC.CornerRadius = UDim.new(0, 6)
 DCC.Parent = DC
 
-local DCS = Instance.new("UIStroke")
-DCS.Color = Color3.fromRGB(30, 30, 50)
-DCS.Thickness = 1
-DCS.Transparency = 0.5
-DCS.Parent = DC
-
 local DL = Instance.new("TextLabel")
-DL.Name = randomName()
 DL.Size = UDim2.new(1, -10, 0, 10)
 DL.Position = UDim2.new(0, 8, 0, 4)
 DL.BackgroundTransparency = 1
@@ -308,11 +189,9 @@ DL.Text = "DETECTED"
 DL.TextSize = 7
 DL.Font = Enum.Font.GothamBold
 DL.TextColor3 = Color3.fromRGB(100, 100, 140)
-DL.TextXAlignment = Enum.TextXAlignment.Left
 DL.Parent = DC
 
 local DCL = Instance.new("TextLabel")
-DCL.Name = randomName()
 DCL.Size = UDim2.new(1, -10, 0, 16)
 DCL.Position = UDim2.new(0, 8, 0, 14)
 DCL.BackgroundTransparency = 1
@@ -320,38 +199,26 @@ DCL.Text = "-"
 DCL.TextSize = 14
 DCL.Font = Enum.Font.GothamBold
 DCL.TextColor3 = Color3.fromRGB(80, 220, 100)
-DCL.TextXAlignment = Enum.TextXAlignment.Left
-DCL.TextYAlignment = Enum.TextYAlignment.Center
 DCL.Parent = DC
 
 -- AUTO ENTER + AFTER + WORDS
 local AR = Instance.new("Frame")
-AR.Name = randomName()
 AR.Size = UDim2.new(1, -16, 0, 26)
 AR.Position = UDim2.new(0, 8, 0, 102)
 AR.BackgroundTransparency = 1
 AR.Parent = FR
 
+-- AUTO ENTER
 local AL = Instance.new("Frame")
-AL.Name = randomName()
 AL.Size = UDim2.new(0.33, -2, 1, 0)
 AL.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
-AL.BorderSizePixel = 0
-AL.BackgroundTransparency = 0.05
 AL.Parent = AR
 
 local ALC = Instance.new("UICorner")
 ALC.CornerRadius = UDim.new(0, 5)
 ALC.Parent = AL
 
-local ALS = Instance.new("UIStroke")
-ALS.Color = Color3.fromRGB(30, 30, 50)
-ALS.Thickness = 1
-ALS.Transparency = 0.5
-ALS.Parent = AL
-
 local AEL = Instance.new("TextLabel")
-AEL.Name = randomName()
 AEL.Size = UDim2.new(1, -6, 1, 0)
 AEL.Position = UDim2.new(0, 6, 0, 0)
 AEL.BackgroundTransparency = 1
@@ -363,8 +230,8 @@ AEL.TextXAlignment = Enum.TextXAlignment.Left
 AEL.TextYAlignment = Enum.TextYAlignment.Center
 AEL.Parent = AL
 
+-- AFTER
 local AFB = Instance.new("TextBox")
-AFB.Name = randomName()
 AFB.Size = UDim2.new(0.33, -2, 1, 0)
 AFB.Position = UDim2.new(0.33, 2, 0, 0)
 AFB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -374,40 +241,24 @@ AFB.TextColor3 = Color3.fromRGB(80, 220, 100)
 AFB.TextSize = 11
 AFB.Font = Enum.Font.GothamBold
 AFB.TextXAlignment = Enum.TextXAlignment.Center
-AFB.BackgroundTransparency = 0.05
 AFB.Parent = AR
 
 local AFBC = Instance.new("UICorner")
 AFBC.CornerRadius = UDim.new(0, 5)
 AFBC.Parent = AFB
 
-local AFBS = Instance.new("UIStroke")
-AFBS.Color = Color3.fromRGB(30, 30, 50)
-AFBS.Thickness = 1
-AFBS.Transparency = 0.5
-AFBS.Parent = AFB
-
+-- WORDS
 local WB = Instance.new("Frame")
-WB.Name = randomName()
 WB.Size = UDim2.new(0.34, -2, 1, 0)
 WB.Position = UDim2.new(0.66, 2, 0, 0)
 WB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
-WB.BorderSizePixel = 0
-WB.BackgroundTransparency = 0.05
 WB.Parent = AR
 
 local WBC = Instance.new("UICorner")
 WBC.CornerRadius = UDim.new(0, 5)
 WBC.Parent = WB
 
-local WBS = Instance.new("UIStroke")
-WBS.Color = Color3.fromRGB(30, 30, 50)
-WBS.Thickness = 1
-WBS.Transparency = 0.5
-WBS.Parent = WB
-
 local WL = Instance.new("TextLabel")
-WL.Name = randomName()
 WL.Size = UDim2.new(1, 0, 1, 0)
 WL.BackgroundTransparency = 1
 WL.Text = "0/3"
@@ -420,14 +271,12 @@ WL.Parent = WB
 
 -- BUTTON ROW 1
 local BR1 = Instance.new("Frame")
-BR1.Name = randomName()
 BR1.Size = UDim2.new(1, -16, 0, 22)
 BR1.Position = UDim2.new(0, 8, 0, 132)
 BR1.BackgroundTransparency = 1
 BR1.Parent = FR
 
 local PB = Instance.new("TextButton")
-PB.Name = randomName()
 PB.Size = UDim2.new(0.5, -3, 1, 0)
 PB.Position = UDim2.new(0, 0, 0, 0)
 PB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -436,21 +285,13 @@ PB.Text = "Pick Box"
 PB.TextColor3 = Color3.fromRGB(200, 200, 220)
 PB.TextSize = 10
 PB.Font = Enum.Font.GothamBold
-PB.BackgroundTransparency = 0.05
 PB.Parent = BR1
 
 local PBC = Instance.new("UICorner")
 PBC.CornerRadius = UDim.new(0, 5)
 PBC.Parent = PB
 
-local PBS = Instance.new("UIStroke")
-PBS.Color = Color3.fromRGB(30, 30, 50)
-PBS.Thickness = 1
-PBS.Transparency = 0.5
-PBS.Parent = PB
-
 local RB = Instance.new("TextButton")
-RB.Name = randomName()
 RB.Size = UDim2.new(0.5, -3, 1, 0)
 RB.Position = UDim2.new(0.5, 3, 0, 0)
 RB.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
@@ -459,29 +300,20 @@ RB.Text = "Reset"
 RB.TextColor3 = Color3.fromRGB(255, 255, 255)
 RB.TextSize = 10
 RB.Font = Enum.Font.GothamBold
-RB.BackgroundTransparency = 0.05
 RB.Parent = BR1
 
 local RBC = Instance.new("UICorner")
 RBC.CornerRadius = UDim.new(0, 5)
 RBC.Parent = RB
 
-local RBS = Instance.new("UIStroke")
-RBS.Color = Color3.fromRGB(200, 50, 50)
-RBS.Thickness = 1
-RBS.Transparency = 0.3
-RBS.Parent = RB
-
--- BUTTON ROW 2 (Freeze + Auto Buy)
+-- BUTTON ROW 2
 local BR2 = Instance.new("Frame")
-BR2.Name = randomName()
 BR2.Size = UDim2.new(1, -16, 0, 22)
 BR2.Position = UDim2.new(0, 8, 0, 158)
 BR2.BackgroundTransparency = 1
 BR2.Parent = FR
 
 local FB = Instance.new("TextButton")
-FB.Name = randomName()
 FB.Size = UDim2.new(0.5, -3, 1, 0)
 FB.Position = UDim2.new(0, 0, 0, 0)
 FB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -490,21 +322,13 @@ FB.Text = "Freeze"
 FB.TextColor3 = Color3.fromRGB(200, 200, 220)
 FB.TextSize = 10
 FB.Font = Enum.Font.GothamBold
-FB.BackgroundTransparency = 0.05
 FB.Parent = BR2
 
 local FBC = Instance.new("UICorner")
 FBC.CornerRadius = UDim.new(0, 5)
 FBC.Parent = FB
 
-local FBS = Instance.new("UIStroke")
-FBS.Color = Color3.fromRGB(30, 30, 50)
-FBS.Thickness = 1
-FBS.Transparency = 0.5
-FBS.Parent = FB
-
 local ABB = Instance.new("TextButton")
-ABB.Name = randomName()
 ABB.Size = UDim2.new(0.5, -3, 1, 0)
 ABB.Position = UDim2.new(0.5, 3, 0, 0)
 ABB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -513,22 +337,14 @@ ABB.Text = "Auto Buy"
 ABB.TextColor3 = Color3.fromRGB(200, 200, 220)
 ABB.TextSize = 10
 ABB.Font = Enum.Font.GothamBold
-ABB.BackgroundTransparency = 0.05
 ABB.Parent = BR2
 
 local ABBC = Instance.new("UICorner")
 ABBC.CornerRadius = UDim.new(0, 5)
 ABBC.Parent = ABB
 
-local ABBS = Instance.new("UIStroke")
-ABBS.Color = Color3.fromRGB(30, 30, 50)
-ABBS.Thickness = 1
-ABBS.Transparency = 0.5
-ABBS.Parent = ABB
-
 -- CREDIT
 local CL = Instance.new("TextLabel")
-CL.Name = randomName()
 CL.Size = UDim2.new(1, 0, 0, 16)
 CL.Position = UDim2.new(0, 0, 0, 193)
 CL.BackgroundTransparency = 1
@@ -541,21 +357,15 @@ CL.TextXAlignment = Enum.TextXAlignment.Center
 CL.TextYAlignment = Enum.TextYAlignment.Center
 CL.Parent = FR
 
--- ============================================
 -- FUNCTIONS
--- ============================================
 local function updateWords()
     WL.Text = count .. "/" .. target
     if count >= target then
         WL.TextColor3 = Color3.fromRGB(80, 255, 80)
         DOT.BackgroundColor3 = Color3.fromRGB(80, 255, 80)
-        WBS.Color = Color3.fromRGB(80, 255, 80)
-        WBS.Transparency = 0.3
     else
         WL.TextColor3 = Color3.fromRGB(80, 220, 100)
         DOT.BackgroundColor3 = Color3.fromRGB(80, 220, 100)
-        WBS.Color = Color3.fromRGB(30, 30, 50)
-        WBS.Transparency = 0.5
     end
 end
 
@@ -572,20 +382,14 @@ local function stopPick()
     PB.Text = "Pick Box"
     PB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
     PB.TextColor3 = Color3.fromRGB(200, 200, 220)
-    PBS.Color = Color3.fromRGB(30, 30, 50)
-    PBS.Transparency = 0.5
 end
 
 local function flashCode(code)
     DCL.Text = code
     DCL.TextColor3 = Color3.fromRGB(80, 255, 120)
-    DCS.Color = Color3.fromRGB(80, 255, 120)
-    DCS.Transparency = 0.3
 end
 
--- ============================================
 -- MINIMIZE
--- ============================================
 local function toggleMin()
     minimized = not minimized
     if minimized then
@@ -593,32 +397,24 @@ local function toggleMin()
         MB.Visible = true
         MNB.Text = "+"
         MNB.BackgroundColor3 = Color3.fromRGB(60, 220, 90)
-        MNBS.Color = Color3.fromRGB(60, 220, 90)
-        MNBS.Transparency = 0.3
     else
         FR.Visible = true
         MB.Visible = false
         MNB.Text = "−"
         MNB.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        MNBS.Color = Color3.fromRGB(200, 50, 50)
-        MNBS.Transparency = 0.5
     end
 end
 
 MNB.MouseButton1Click:Connect(toggleMin)
 MB.MouseButton1Click:Connect(toggleMin)
 
--- ============================================
 -- ON/OFF
--- ============================================
 OB.MouseButton1Click:Connect(function()
     enabled = not enabled
     if enabled then
         OB.Text = "ON"
         OB.BackgroundColor3 = Color3.fromRGB(60, 220, 90)
         OB.TextColor3 = Color3.fromRGB(0, 0, 0)
-        OBS.Color = Color3.fromRGB(60, 220, 90)
-        OBS.Transparency = 0.3
         setStatus("Auto-Enter ON", Color3.fromRGB(80, 255, 120))
         codes = {}
         count = 0
@@ -627,8 +423,6 @@ OB.MouseButton1Click:Connect(function()
         OB.Text = "OFF"
         OB.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
         OB.TextColor3 = Color3.fromRGB(255, 255, 255)
-        OBS.Color = Color3.fromRGB(220, 60, 60)
-        OBS.Transparency = 0.3
         setStatus("Auto-Enter OFF", Color3.fromRGB(255, 200, 50))
         codes = {}
         count = 0
@@ -636,9 +430,7 @@ OB.MouseButton1Click:Connect(function()
     end
 end)
 
--- ============================================
 -- PICK BOX
--- ============================================
 PB.MouseButton1Click:Connect(function()
     if pickMode then
         stopPick()
@@ -648,8 +440,6 @@ PB.MouseButton1Click:Connect(function()
     PB.Text = "Click into any TextBox..."
     PB.BackgroundColor3 = Color3.fromRGB(255, 160, 20)
     PB.TextColor3 = Color3.fromRGB(0, 0, 0)
-    PBS.Color = Color3.fromRGB(255, 160, 20)
-    PBS.Transparency = 0.3
     setStatus("Click into the box you want codes in", Color3.fromRGB(255, 200, 50))
 end)
 
@@ -673,25 +463,15 @@ PG.DescendantAdded:Connect(function(obj)
     watchBox(obj)
 end)
 
--- ============================================
 -- RESET
--- ============================================
 RB.MouseButton1Click:Connect(function()
     codes = {}
     count = 0
     updateWords()
     setStatus("Reset!", Color3.fromRGB(255, 200, 50))
-    wait(1.5)
-    if enabled then
-        setStatus("Auto-Enter ON", Color3.fromRGB(80, 255, 120))
-    else
-        setStatus("Auto-Enter OFF", Color3.fromRGB(255, 200, 50))
-    end
 end)
 
--- ============================================
 -- FREEZE
--- ============================================
 FB.MouseButton1Click:Connect(function()
     frozen = not frozen
     local char = LP.Character
@@ -708,8 +488,6 @@ FB.MouseButton1Click:Connect(function()
         FB.Text = "Unfreeze"
         FB.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
         FB.TextColor3 = Color3.fromRGB(255, 255, 255)
-        FBS.Color = Color3.fromRGB(200, 50, 50)
-        FBS.Transparency = 0.3
         setStatus("Frozen!", Color3.fromRGB(80, 220, 255))
     else
         if root then root.Anchored = false end
@@ -720,15 +498,11 @@ FB.MouseButton1Click:Connect(function()
         FB.Text = "Freeze"
         FB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
         FB.TextColor3 = Color3.fromRGB(200, 200, 220)
-        FBS.Color = Color3.fromRGB(30, 30, 50)
-        FBS.Transparency = 0.5
         setStatus("Unfrozen!", Color3.fromRGB(255, 200, 50))
     end
 end)
 
--- ============================================
 -- AUTO BUY
--- ============================================
 local function isPrompt(obj)
     if not obj or not obj:IsA("ProximityPrompt") then return false end
     local p = obj.Parent
@@ -822,23 +596,17 @@ local function toggleBuy()
         ABB.Text = "Auto Buy"
         ABB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
         ABB.TextColor3 = Color3.fromRGB(200, 200, 220)
-        ABBS.Color = Color3.fromRGB(30, 30, 50)
-        ABBS.Transparency = 0.5
     else
         startBuy()
         ABB.Text = "Stop Buy"
         ABB.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
         ABB.TextColor3 = Color3.fromRGB(255, 255, 255)
-        ABBS.Color = Color3.fromRGB(200, 50, 50)
-        ABBS.Transparency = 0.3
     end
 end
 
 ABB.MouseButton1Click:Connect(toggleBuy)
 
--- ============================================
 -- AFTER BOX
--- ============================================
 AFB:GetPropertyChangedSignal("Text"):Connect(function()
     local text = AFB.Text
     if text ~= "" and not tonumber(text) then
@@ -868,14 +636,11 @@ AFB.FocusLost:Connect(function()
     end
 end)
 
--- ============================================
 -- DRAG
--- ============================================
 local drag, dragStart, startPos
 
 FR.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-    or input.UserInputType == Enum.UserInputType.Touch then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
         drag = true
         dragStart = input.Position
         startPos = FR.Position
@@ -883,8 +648,7 @@ FR.InputBegan:Connect(function(input)
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if drag and (input.UserInputType == Enum.UserInputType.MouseMovement
-    or input.UserInputType == Enum.UserInputType.Touch) then
+    if drag and input.UserInputType == Enum.UserInputType.MouseMovement then
         local delta = input.Position - dragStart
         FR.Position = UDim2.new(
             startPos.X.Scale, startPos.X.Offset + delta.X,
@@ -894,15 +658,12 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 FR.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-    or input.UserInputType == Enum.UserInputType.Touch then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
         drag = false
     end
 end)
 
--- ============================================
 -- PRESS ENTER
--- ============================================
 local function pressEnter()
     pcall(function()
         VIM:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
@@ -915,9 +676,7 @@ local function pressEnter()
     end)
 end
 
--- ============================================
 -- COLLECT & REDEEM
--- ============================================
 local function collectAndRedeem(code)
     if not code or code == "" then return end
     if not enabled then return end
@@ -938,7 +697,6 @@ local function collectAndRedeem(code)
             local combined = table.concat(codes, " ")
             pcall(function()
                 box.Text = combined
-                box.CursorPosition = #combined + 1
             end)
         end
         
@@ -949,8 +707,6 @@ local function collectAndRedeem(code)
         OB.Text = "OFF"
         OB.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
         OB.TextColor3 = Color3.fromRGB(255, 255, 255)
-        OBS.Color = Color3.fromRGB(220, 60, 60)
-        OBS.Transparency = 0.3
         setStatus("Redeemed! Auto OFF", Color3.fromRGB(255, 200, 50))
         
         codes = {}
@@ -959,9 +715,7 @@ local function collectAndRedeem(code)
     end
 end
 
--- ============================================
 -- PASTE CODE
--- ============================================
 local function pasteCode(text)
     if not enabled then return end
     
@@ -990,9 +744,7 @@ local function pasteCode(text)
     collectAndRedeem(code)
 end
 
--- ============================================
 -- REMOTE HOOK
--- ============================================
 task.spawn(function()
     local function scan(p)
         for _, c in ipairs(p:GetChildren()) do
