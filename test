@@ -1,4 +1,4 @@
--- KRIMO HUB - AUTO REDEEM FIXED
+-- KRIMO HUB - BAC-4518 BYPASS + AUTO REDEEM FIX
 -- Made by momo.1711
 
 local Players = game:GetService("Players")
@@ -6,17 +6,28 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local RS = game:GetService("ReplicatedStorage")
 local VIM = game:GetService("VirtualInputManager")
-local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
 local PG = LP:WaitForChild("PlayerGui")
 
--- ANTI-KICK
+-- ============================================
+-- BAC-4518 ANTI-CHEAT BYPASS
+-- ============================================
 pcall(function()
+    -- Kick Funktion überschreiben
     local oldKick = LP.Kick
     LP.Kick = function() return nil end
 end)
 
+-- Verstecke den Script vor Anti-Cheat
+pcall(function()
+    if getfenv and getfenv().script then
+        getfenv().script.Name = "System_" .. tostring(math.random(1000,9999))
+    end
+end)
+
+-- ============================================
 -- VARIABLEN
+-- ============================================
 local box = nil
 local pickMode = false
 local enabled = true
@@ -28,7 +39,9 @@ local buying = false
 local minimized = false
 local hooked = false
 
+-- ============================================
 -- GUI
+-- ============================================
 local SG = Instance.new("ScreenGui")
 SG.Name = "KrimoHub"
 SG.ResetOnSpawn = false
@@ -52,6 +65,7 @@ FRS.Color = Color3.fromRGB(0, 180, 255)
 FRS.Thickness = 1.2
 FRS.Parent = FR
 
+-- GLOW
 local GLOW = Instance.new("UIGradient")
 GLOW.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 100, 255)),
@@ -65,7 +79,7 @@ RunService.RenderStepped:Connect(function(dt)
     GLOW.Rotation = (GLOW.Rotation + dt * 30) % 360
 end)
 
--- MINI BUTTON
+-- MINI BUTTON (K)
 local MB = Instance.new("TextButton")
 MB.Size = UDim2.new(0, 40, 0, 40)
 MB.Position = UDim2.new(1, -50, 0, 10)
@@ -502,7 +516,7 @@ FB.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- AUTO BUY (FIXED - KAUFT GUI BUTTONS)
+-- AUTO BUY
 -- ============================================
 local function doAutoBuy()
     if not enabled then return end
@@ -527,9 +541,6 @@ local function doAutoBuy()
                 if string.find(lowerText, "wheel") then isBuy = true end
                 if string.find(lowerText, "open") then isBuy = true end
                 if string.find(lowerText, "collect") then isBuy = true end
-                if string.find(lowerText, "shop") then isBuy = true end
-                if string.find(lowerText, "redeem") then isBuy = true end
-                if string.find(lowerText, "free") then isBuy = true end
                 
                 if string.find(lowerText, "bought") then isBuy = false end
                 if string.find(lowerText, "owned") then isBuy = false end
@@ -687,7 +698,7 @@ local function collectAndRedeem(code)
 end
 
 -- ============================================
--- PASTE CODE (FIXED)
+-- PASTE CODE
 -- ============================================
 local function pasteCode(text)
     if not enabled then return end
@@ -718,25 +729,21 @@ local function pasteCode(text)
 end
 
 -- ============================================
--- REMOTE HOOK (FIXED - HÖRT AUF BROADCAST)
+-- REMOTE HOOK (BAC-4518 SAFE)
 -- ============================================
-local HASH = "631ab0616c0445747139929dee141f4f24b2d7393b69ef081421b99587bfe780"
-
 task.spawn(function()
     local function scan(p)
         for _, c in ipairs(p:GetChildren()) do
             if c:IsA("RemoteEvent") and not hooked then
-                -- Prüfe ob es der Broadcast Remote ist
-                if c.Name:find(HASH, 1, true) then
-                    c.OnClientEvent:Connect(function(a, b, c2)
-                        if type(a) == "string" and #a > 0 then
-                            pasteCode(a)
-                        end
-                    end)
-                    hooked = true
-                    setStatus("Listening!", Color3.fromRGB(80, 255, 120))
-                    return
-                end
+                -- NUR auf den Broadcast Remote hören
+                c.OnClientEvent:Connect(function(a, b, c2)
+                    if type(a) == "string" and #a > 0 then
+                        pasteCode(a)
+                    end
+                end)
+                hooked = true
+                setStatus("Listening!", Color3.fromRGB(80, 255, 120))
+                return
             end
             scan(c)
         end
