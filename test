@@ -1,74 +1,54 @@
--- KRIMO HUB - COMPLETE + ANTI-CHEAT BYPASS
+-- KRIMO HUB - COMPLETE + ANTI-CHEAT (NO ERRORS)
 -- Made by momo.1711
 
 -- ============================================
--- ANTI-CHEAT BYPASS
+-- ANTI-CHEAT BYPASS (SAFE - NO ERRORS)
 -- ============================================
 
--- 1. SCRIPT NAME SPOOFING
-local oldScript = script
-script = nil
-getfenv().script = nil
-
--- 2. VERHINDERE METATABLE DETECTION
-local oldGetRawMetatable = getrawmetatable
-getrawmetatable = function(...)
-    local args = {...}
-    if args[1] == game or args[1] == workspace or args[1] == shared then
-        return nil
+-- 1. SCRIPT NAME SPOOFING (SAFE)
+pcall(function()
+    if getfenv and getfenv().script then
+        getfenv().script.Name = "System_" .. tostring(math.random(1000,9999))
     end
-    return oldGetRawMetatable(...)
-end
+end)
 
--- 3. VERHINDERE TASK.WAIT FREEZE DETECTION
-local oldWait = task.wait
-task.wait = function(time)
-    if time and time > 0.5 then
-        time = 0.3
+-- 2. KICK BYPASS (SAFE)
+pcall(function()
+    local LP = game:GetService("Players").LocalPlayer
+    if LP and LP.Kick then
+        LP.Kick = function() return nil end
     end
-    return oldWait(time or 0)
-end
+end)
 
--- 4. KICK BYPASS
-local oldKick = game:GetService("Players").LocalPlayer.Kick
-game:GetService("Players").LocalPlayer.Kick = function(self, ...)
-    return nil
-end
-
--- 5. VERHINDERE DEBUG INFO
-local oldDebugInfo = debug.info
-debug.info = function(...)
-    local args = {...}
-    if args[2] == "f" then
-        return oldDebugInfo(2, "f")
+-- 3. TASK.WAIT BYPASS (SAFE)
+pcall(function()
+    local oldWait = task.wait
+    task.wait = function(t)
+        if t and t > 1 then t = 0.3 end
+        return oldWait(t or 0)
     end
-    return oldDebugInfo(...)
-end
+end)
 
--- 6. METATABLE SPOOFING
-local oldHookMetamethod = hookmetamethod
-hookmetamethod = function(...)
-    local args = {...}
-    if args[1] == game or args[1] == workspace then
-        return nil
-    end
-    return oldHookMetamethod(...)
-end
-
--- 7. DEAKTIVIERE GETNAMEcallMETHOD
-local oldGetNamecallMethod = getnamecallmethod
-getnamecallmethod = function()
-    return nil
-end
-
--- 8. RANDOM NAME GENERATOR
+-- 4. RANDOM NAME GENERATOR
 local function randomName()
     local name = ""
-    for i = 1, 12 do
+    for i = 1, 10 do
         name = name .. string.char(math.random(97, 122))
     end
     return name
 end
+
+-- 5. GETRAWMETATABLE SAFE (NUR WENN VERFÜGBAR)
+local safeGetRawMetatable = nil
+pcall(function()
+    safeGetRawMetatable = getrawmetatable
+end)
+
+-- 6. HOOKMETAMETHOD SAFE (NUR WENN VERFÜGBAR)
+local safeHookMetamethod = nil
+pcall(function()
+    safeHookMetamethod = hookmetamethod
+end)
 
 -- ============================================
 -- SERVICES
@@ -1042,4 +1022,4 @@ task.spawn(function()
 end)
 
 updateWords()
-setStatus("Pick a TextBox first", Color3.fromRGB(180, 180, 200)) first", Color3.fromRGB(180, 180, 200))
+setStatus("Pick a TextBox first", Color3.fromRGB(180, 180, 200))
