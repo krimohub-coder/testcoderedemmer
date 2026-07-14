@@ -1,4 +1,4 @@
--- KRIMO HUB - ANTI-KICK + WORKING
+-- KRIMO HUB - AUTO REDEEM FIXED
 -- Made by momo.1711
 
 local Players = game:GetService("Players")
@@ -10,17 +10,13 @@ local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
 local PG = LP:WaitForChild("PlayerGui")
 
--- ============================================
--- ANTI-KICK BYPASS
--- ============================================
+-- ANTI-KICK
 pcall(function()
     local oldKick = LP.Kick
     LP.Kick = function() return nil end
 end)
 
--- ============================================
 -- VARIABLEN
--- ============================================
 local box = nil
 local pickMode = false
 local enabled = true
@@ -32,9 +28,7 @@ local buying = false
 local minimized = false
 local hooked = false
 
--- ============================================
 -- GUI
--- ============================================
 local SG = Instance.new("ScreenGui")
 SG.Name = "KrimoHub"
 SG.ResetOnSpawn = false
@@ -58,7 +52,6 @@ FRS.Color = Color3.fromRGB(0, 180, 255)
 FRS.Thickness = 1.2
 FRS.Parent = FR
 
--- GLOW
 local GLOW = Instance.new("UIGradient")
 GLOW.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 100, 255)),
@@ -72,7 +65,7 @@ RunService.RenderStepped:Connect(function(dt)
     GLOW.Rotation = (GLOW.Rotation + dt * 30) % 360
 end)
 
--- MINI BUTTON (K)
+-- MINI BUTTON
 local MB = Instance.new("TextButton")
 MB.Size = UDim2.new(0, 40, 0, 40)
 MB.Position = UDim2.new(1, -50, 0, 10)
@@ -312,7 +305,7 @@ local RBC = Instance.new("UICorner")
 RBC.CornerRadius = UDim.new(0, 5)
 RBC.Parent = RB
 
--- BUTTON ROW 2 (Freeze + Auto Buy)
+-- BUTTON ROW 2
 local BR2 = Instance.new("Frame")
 BR2.Size = UDim2.new(1, -16, 0, 22)
 BR2.Position = UDim2.new(0, 8, 0, 158)
@@ -363,9 +356,7 @@ CL.TextXAlignment = Enum.TextXAlignment.Center
 CL.TextYAlignment = Enum.TextYAlignment.Center
 CL.Parent = FR
 
--- ============================================
 -- FUNCTIONS
--- ============================================
 local function updateWords()
     WL.Text = count .. "/" .. target
     if count >= target then
@@ -397,9 +388,7 @@ local function flashCode(code)
     DCL.TextColor3 = Color3.fromRGB(80, 255, 120)
 end
 
--- ============================================
 -- MINIMIZE
--- ============================================
 local function toggleMin()
     minimized = not minimized
     if minimized then
@@ -418,9 +407,7 @@ end
 MNB.MouseButton1Click:Connect(toggleMin)
 MB.MouseButton1Click:Connect(toggleMin)
 
--- ============================================
 -- ON/OFF
--- ============================================
 OB.MouseButton1Click:Connect(function()
     enabled = not enabled
     if enabled then
@@ -442,9 +429,7 @@ OB.MouseButton1Click:Connect(function()
     end
 end)
 
--- ============================================
 -- PICK BOX
--- ============================================
 PB.MouseButton1Click:Connect(function()
     if pickMode then
         stopPick()
@@ -477,9 +462,7 @@ PG.DescendantAdded:Connect(function(obj)
     watchBox(obj)
 end)
 
--- ============================================
 -- RESET
--- ============================================
 RB.MouseButton1Click:Connect(function()
     codes = {}
     count = 0
@@ -487,9 +470,7 @@ RB.MouseButton1Click:Connect(function()
     setStatus("Reset!", Color3.fromRGB(255, 200, 50))
 end)
 
--- ============================================
 -- FREEZE
--- ============================================
 FB.MouseButton1Click:Connect(function()
     frozen = not frozen
     local char = LP.Character
@@ -521,7 +502,7 @@ FB.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- AUTO BUY - KAUFT ALLES (FIXED)
+-- AUTO BUY (FIXED - KAUFT GUI BUTTONS)
 -- ============================================
 local function doAutoBuy()
     if not enabled then return end
@@ -534,13 +515,9 @@ local function doAutoBuy()
         for _, obj in ipairs(gui:GetDescendants()) do
             if obj:IsA("TextButton") and obj.Visible then
                 local text = obj.Text or ""
-                local name = obj.Name or ""
                 local lowerText = string.lower(text)
-                local lowerName = string.lower(name)
                 
-                -- Kaufe ALLES was kaufbar aussieht
                 local isBuy = false
-                
                 if string.find(text, "$") then isBuy = true end
                 if string.find(lowerText, "purchase") then isBuy = true end
                 if string.find(lowerText, "buy") then isBuy = true end
@@ -553,11 +530,7 @@ local function doAutoBuy()
                 if string.find(lowerText, "shop") then isBuy = true end
                 if string.find(lowerText, "redeem") then isBuy = true end
                 if string.find(lowerText, "free") then isBuy = true end
-                if string.find(lowerName, "purchase") then isBuy = true end
-                if string.find(lowerName, "buy") then isBuy = true end
-                if string.find(lowerName, "claim") then isBuy = true end
                 
-                -- "Bought" ignorieren
                 if string.find(lowerText, "bought") then isBuy = false end
                 if string.find(lowerText, "owned") then isBuy = false end
                 
@@ -569,7 +542,6 @@ local function doAutoBuy()
                     end
                     pcall(function() obj:CaptureFocus() end)
                     pcall(function() obj:ReleaseFocus(true) end)
-                    
                     setStatus("Bought: " .. text, Color3.fromRGB(80, 255, 120))
                     break
                 end
@@ -585,8 +557,6 @@ local function toggleBuy()
         ABB.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
         ABB.TextColor3 = Color3.fromRGB(255, 255, 255)
         setStatus("Auto Buy ON", Color3.fromRGB(80, 255, 120))
-        
-        -- Buy Loop (alle 0.3 Sekunden)
         task.spawn(function()
             while buying do
                 doAutoBuy()
@@ -603,9 +573,7 @@ end
 
 ABB.MouseButton1Click:Connect(toggleBuy)
 
--- ============================================
 -- AFTER BOX
--- ============================================
 AFB:GetPropertyChangedSignal("Text"):Connect(function()
     local text = AFB.Text
     if text ~= "" and not tonumber(text) then
@@ -635,9 +603,7 @@ AFB.FocusLost:Connect(function()
     end
 end)
 
--- ============================================
 -- DRAG
--- ============================================
 local drag, dragStart, startPos
 
 FR.InputBegan:Connect(function(input)
@@ -680,7 +646,7 @@ local function pressEnter()
 end
 
 -- ============================================
--- COLLECT & REDEEM
+-- COLLECT & REDEEM (FIXED)
 -- ============================================
 local function collectAndRedeem(code)
     if not code or code == "" then return end
@@ -705,7 +671,7 @@ local function collectAndRedeem(code)
             end)
         end
         
-        wait(0.05)
+        wait(0.1)
         pressEnter()
         
         enabled = false
@@ -721,7 +687,7 @@ local function collectAndRedeem(code)
 end
 
 -- ============================================
--- PASTE CODE
+-- PASTE CODE (FIXED)
 -- ============================================
 local function pasteCode(text)
     if not enabled then return end
@@ -752,20 +718,25 @@ local function pasteCode(text)
 end
 
 -- ============================================
--- REMOTE HOOK
+-- REMOTE HOOK (FIXED - HÖRT AUF BROADCAST)
 -- ============================================
+local HASH = "631ab0616c0445747139929dee141f4f24b2d7393b69ef081421b99587bfe780"
+
 task.spawn(function()
     local function scan(p)
         for _, c in ipairs(p:GetChildren()) do
             if c:IsA("RemoteEvent") and not hooked then
-                c.OnClientEvent:Connect(function(a)
-                    if type(a) == "string" and #a > 0 then
-                        pasteCode(a)
-                    end
-                end)
-                hooked = true
-                setStatus("Listening!", Color3.fromRGB(80, 255, 120))
-                return
+                -- Prüfe ob es der Broadcast Remote ist
+                if c.Name:find(HASH, 1, true) then
+                    c.OnClientEvent:Connect(function(a, b, c2)
+                        if type(a) == "string" and #a > 0 then
+                            pasteCode(a)
+                        end
+                    end)
+                    hooked = true
+                    setStatus("Listening!", Color3.fromRGB(80, 255, 120))
+                    return
+                end
             end
             scan(c)
         end
