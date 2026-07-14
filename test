@@ -1,6 +1,78 @@
--- KRIMO HUB - 100% ERROR FREE
+-- KRIMO HUB - ANTI-CHEAT BYPASS VERSION
 -- Made by momo.1711
 
+-- ============================================
+-- ANTI-CHEAT BYPASS
+-- ============================================
+
+-- 1. SCRIPT NAME SPOOFING
+local oldScript = script
+script = nil
+getfenv().script = nil
+
+-- 2. VERHINDERE METATABLE DETECTION
+local oldGetRawMetatable = getrawmetatable
+getrawmetatable = function(...)
+    local args = {...}
+    if args[1] == game or args[1] == workspace or args[1] == shared then
+        return nil
+    end
+    return oldGetRawMetatable(...)
+end
+
+-- 3. VERHINDERE TASK.WAIT FREEZE DETECTION
+local oldWait = task.wait
+task.wait = function(time)
+    if time and time > 0.5 then
+        time = 0.3
+    end
+    return oldWait(time or 0)
+end
+
+-- 4. KICK BYPASS
+local oldKick = game:GetService("Players").LocalPlayer.Kick
+game:GetService("Players").LocalPlayer.Kick = function(self, ...)
+    return nil
+end
+
+-- 5. VERHINDERE DEBUG INFO (deaktiviert Debugging)
+local oldDebugInfo = debug.info
+debug.info = function(...)
+    local args = {...}
+    if args[2] == "f" then
+        return oldDebugInfo(2, "f")
+    end
+    return oldDebugInfo(...)
+end
+
+-- 6. METATABLE SPOOFING
+local oldHookMetamethod = hookmetamethod
+hookmetamethod = function(...)
+    local args = {...}
+    if args[1] == game or args[1] == workspace then
+        return nil
+    end
+    return oldHookMetamethod(...)
+end
+
+-- 7. DEAKTIVIERE GETNAMEcallMETHOD
+local oldGetNamecallMethod = getnamecallmethod
+getnamecallmethod = function()
+    return nil
+end
+
+-- 8. SCRIPT NAME VERSCHLEIERN
+local function randomName()
+    local name = ""
+    for i = 1, 12 do
+        name = name .. string.char(math.random(97, 122))
+    end
+    return name
+end
+
+-- ============================================
+-- SERVICES
+-- ============================================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -8,19 +80,11 @@ local RS = game:GetService("ReplicatedStorage")
 local VIM = game:GetService("VirtualInputManager")
 local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
-local PG = LP:FindFirstChild("PlayerGui")
+local PG = LP:FindFirstChild("PlayerGui") or LP:WaitForChild("PlayerGui")
 
-if not PG then
-    PG = Instance.new("ScreenGui")
-    PG.Name = "KrimoHubContainer"
-    PG.Parent = LP
-    wait(0.5)
-    PG = LP:FindFirstChild("PlayerGui") or Instance.new("ScreenGui")
-    PG.Name = "PlayerGui"
-    PG.Parent = LP
-end
-
+-- ============================================
 -- VARIABLEN
+-- ============================================
 local box = nil
 local pickMode = false
 local enabled = true
@@ -28,24 +92,22 @@ local codes = {}
 local count = 0
 local target = 3
 local frozen = false
-local buying = false
-local prompts = {}
-local promptConn = nil
-local renderConn = nil
 local minimized = false
 local hooked = false
 
 -- ============================================
--- GUI
+-- GUI MIT RANDOM NAMEN
 -- ============================================
 local SG = Instance.new("ScreenGui")
-SG.Name = "KrimoHub"
+SG.Name = randomName()
 SG.ResetOnSpawn = false
 SG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+SG.DisplayOrder = 999
 SG.Parent = PG
 
--- MAIN FRAME
+-- FRAME
 local FR = Instance.new("Frame")
+FR.Name = randomName()
 FR.Size = UDim2.new(0, 340, 0, 210)
 FR.Position = UDim2.new(1, -350, 0, 10)
 FR.BackgroundColor3 = Color3.fromRGB(8, 8, 16)
@@ -53,7 +115,6 @@ FR.BorderSizePixel = 0
 FR.Parent = SG
 
 local FRC = Instance.new("UICorner")
-FRC.CornerRadius = UDim.new(0, 10)
 FRC.Parent = FR
 
 local FRS = Instance.new("UIStroke")
@@ -63,6 +124,7 @@ FRS.Parent = FR
 
 -- MINI BUTTON
 local MB = Instance.new("TextButton")
+MB.Name = randomName()
 MB.Size = UDim2.new(0, 40, 0, 40)
 MB.Position = UDim2.new(1, -50, 0, 10)
 MB.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
@@ -75,21 +137,21 @@ MB.Visible = false
 MB.Parent = SG
 
 local MBC = Instance.new("UICorner")
-MBC.CornerRadius = UDim.new(0, 10)
 MBC.Parent = MB
 
 -- HEADER
 local HD = Instance.new("Frame")
+HD.Name = randomName()
 HD.Size = UDim2.new(1, 0, 0, 32)
 HD.BackgroundColor3 = Color3.fromRGB(12, 12, 22)
 HD.BorderSizePixel = 0
 HD.Parent = FR
 
 local HDC = Instance.new("UICorner")
-HDC.CornerRadius = UDim.new(0, 10)
 HDC.Parent = HD
 
 local TL = Instance.new("TextLabel")
+TL.Name = randomName()
 TL.Size = UDim2.new(0, 120, 1, 0)
 TL.Position = UDim2.new(0, 10, 0, 0)
 TL.BackgroundTransparency = 1
@@ -103,6 +165,7 @@ TL.Parent = HD
 
 -- MINUS BUTTON
 local MNB = Instance.new("TextButton")
+MNB.Name = randomName()
 MNB.Size = UDim2.new(0, 22, 0, 22)
 MNB.AnchorPoint = Vector2.new(1, 0.5)
 MNB.Position = UDim2.new(1, -8, 0.5, 0)
@@ -115,11 +178,11 @@ MNB.Font = Enum.Font.GothamBold
 MNB.Parent = HD
 
 local MNBC = Instance.new("UICorner")
-MNBC.CornerRadius = UDim.new(0, 5)
 MNBC.Parent = MNB
 
 -- ON/OFF
 local OB = Instance.new("TextButton")
+OB.Name = randomName()
 OB.Size = UDim2.new(0, 40, 0, 18)
 OB.AnchorPoint = Vector2.new(1, 0.5)
 OB.Position = UDim2.new(0.9, -8, 0.5, 0)
@@ -133,11 +196,11 @@ OB.TextColor3 = Color3.fromRGB(0, 0, 0)
 OB.Parent = HD
 
 local OBC = Instance.new("UICorner")
-OBC.CornerRadius = UDim.new(0, 5)
 OBC.Parent = OB
 
 -- STATUS
 local SC = Instance.new("Frame")
+SC.Name = randomName()
 SC.Size = UDim2.new(1, -16, 0, 24)
 SC.Position = UDim2.new(0, 8, 0, 38)
 SC.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -145,10 +208,10 @@ SC.BorderSizePixel = 0
 SC.Parent = FR
 
 local SCC = Instance.new("UICorner")
-SCC.CornerRadius = UDim.new(0, 6)
 SCC.Parent = SC
 
 local DOT = Instance.new("Frame")
+DOT.Name = randomName()
 DOT.Size = UDim2.new(0, 6, 0, 6)
 DOT.Position = UDim2.new(0, 8, 0.5, -3)
 DOT.BackgroundColor3 = Color3.fromRGB(80, 220, 100)
@@ -156,10 +219,10 @@ DOT.BorderSizePixel = 0
 DOT.Parent = SC
 
 local DOTC = Instance.new("UICorner")
-DOTC.CornerRadius = UDim.new(0, 3)
 DOTC.Parent = DOT
 
 local SL = Instance.new("TextLabel")
+SL.Name = randomName()
 SL.Size = UDim2.new(1, -22, 1, 0)
 SL.Position = UDim2.new(0, 18, 0, 0)
 SL.BackgroundTransparency = 1
@@ -173,6 +236,7 @@ SL.Parent = SC
 
 -- DETECTED
 local DC = Instance.new("Frame")
+DC.Name = randomName()
 DC.Size = UDim2.new(1, -16, 0, 32)
 DC.Position = UDim2.new(0, 8, 0, 66)
 DC.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -180,10 +244,10 @@ DC.BorderSizePixel = 0
 DC.Parent = FR
 
 local DCC = Instance.new("UICorner")
-DCC.CornerRadius = UDim.new(0, 6)
 DCC.Parent = DC
 
 local DL = Instance.new("TextLabel")
+DL.Name = randomName()
 DL.Size = UDim2.new(1, -10, 0, 10)
 DL.Position = UDim2.new(0, 8, 0, 4)
 DL.BackgroundTransparency = 1
@@ -194,6 +258,7 @@ DL.TextColor3 = Color3.fromRGB(100, 100, 140)
 DL.Parent = DC
 
 local DCL = Instance.new("TextLabel")
+DCL.Name = randomName()
 DCL.Size = UDim2.new(1, -10, 0, 16)
 DCL.Position = UDim2.new(0, 8, 0, 14)
 DCL.BackgroundTransparency = 1
@@ -205,22 +270,24 @@ DCL.Parent = DC
 
 -- AUTO ENTER + AFTER + WORDS
 local AR = Instance.new("Frame")
+AR.Name = randomName()
 AR.Size = UDim2.new(1, -16, 0, 26)
 AR.Position = UDim2.new(0, 8, 0, 102)
 AR.BackgroundTransparency = 1
 AR.Parent = FR
 
 local AL = Instance.new("Frame")
+AL.Name = randomName()
 AL.Size = UDim2.new(0.33, -2, 1, 0)
 AL.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
 AL.BorderSizePixel = 0
 AL.Parent = AR
 
 local ALC = Instance.new("UICorner")
-ALC.CornerRadius = UDim.new(0, 5)
 ALC.Parent = AL
 
 local AEL = Instance.new("TextLabel")
+AEL.Name = randomName()
 AEL.Size = UDim2.new(1, -6, 1, 0)
 AEL.Position = UDim2.new(0, 6, 0, 0)
 AEL.BackgroundTransparency = 1
@@ -233,6 +300,7 @@ AEL.TextYAlignment = Enum.TextYAlignment.Center
 AEL.Parent = AL
 
 local AFB = Instance.new("TextBox")
+AFB.Name = randomName()
 AFB.Size = UDim2.new(0.33, -2, 1, 0)
 AFB.Position = UDim2.new(0.33, 2, 0, 0)
 AFB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -245,10 +313,10 @@ AFB.TextXAlignment = Enum.TextXAlignment.Center
 AFB.Parent = AR
 
 local AFBC = Instance.new("UICorner")
-AFBC.CornerRadius = UDim.new(0, 5)
 AFBC.Parent = AFB
 
 local WB = Instance.new("Frame")
+WB.Name = randomName()
 WB.Size = UDim2.new(0.34, -2, 1, 0)
 WB.Position = UDim2.new(0.66, 2, 0, 0)
 WB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -256,10 +324,10 @@ WB.BorderSizePixel = 0
 WB.Parent = AR
 
 local WBC = Instance.new("UICorner")
-WBC.CornerRadius = UDim.new(0, 5)
 WBC.Parent = WB
 
 local WL = Instance.new("TextLabel")
+WL.Name = randomName()
 WL.Size = UDim2.new(1, 0, 1, 0)
 WL.BackgroundTransparency = 1
 WL.Text = "0/3"
@@ -272,12 +340,14 @@ WL.Parent = WB
 
 -- BUTTON ROW 1
 local BR1 = Instance.new("Frame")
+BR1.Name = randomName()
 BR1.Size = UDim2.new(1, -16, 0, 22)
 BR1.Position = UDim2.new(0, 8, 0, 132)
 BR1.BackgroundTransparency = 1
 BR1.Parent = FR
 
 local PB = Instance.new("TextButton")
+PB.Name = randomName()
 PB.Size = UDim2.new(0.5, -3, 1, 0)
 PB.Position = UDim2.new(0, 0, 0, 0)
 PB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -289,10 +359,10 @@ PB.Font = Enum.Font.GothamBold
 PB.Parent = BR1
 
 local PBC = Instance.new("UICorner")
-PBC.CornerRadius = UDim.new(0, 5)
 PBC.Parent = PB
 
 local RB = Instance.new("TextButton")
+RB.Name = randomName()
 RB.Size = UDim2.new(0.5, -3, 1, 0)
 RB.Position = UDim2.new(0.5, 3, 0, 0)
 RB.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
@@ -304,17 +374,18 @@ RB.Font = Enum.Font.GothamBold
 RB.Parent = BR1
 
 local RBC = Instance.new("UICorner")
-RBC.CornerRadius = UDim.new(0, 5)
 RBC.Parent = RB
 
 -- BUTTON ROW 2
 local BR2 = Instance.new("Frame")
+BR2.Name = randomName()
 BR2.Size = UDim2.new(1, -16, 0, 22)
 BR2.Position = UDim2.new(0, 8, 0, 158)
 BR2.BackgroundTransparency = 1
 BR2.Parent = FR
 
 local FB = Instance.new("TextButton")
+FB.Name = randomName()
 FB.Size = UDim2.new(0.5, -3, 1, 0)
 FB.Position = UDim2.new(0, 0, 0, 0)
 FB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -326,10 +397,10 @@ FB.Font = Enum.Font.GothamBold
 FB.Parent = BR2
 
 local FBC = Instance.new("UICorner")
-FBC.CornerRadius = UDim.new(0, 5)
 FBC.Parent = FB
 
 local ABB = Instance.new("TextButton")
+ABB.Name = randomName()
 ABB.Size = UDim2.new(0.5, -3, 1, 0)
 ABB.Position = UDim2.new(0.5, 3, 0, 0)
 ABB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -341,11 +412,11 @@ ABB.Font = Enum.Font.GothamBold
 ABB.Parent = BR2
 
 local ABBC = Instance.new("UICorner")
-ABBC.CornerRadius = UDim.new(0, 5)
 ABBC.Parent = ABB
 
 -- CREDIT
 local CL = Instance.new("TextLabel")
+CL.Name = randomName()
 CL.Size = UDim2.new(1, 0, 0, 16)
 CL.Position = UDim2.new(0, 0, 0, 193)
 CL.BackgroundTransparency = 1
@@ -667,33 +738,6 @@ end
 -- REMOTE HOOK
 -- ============================================
 task.spawn(function()
-    local net = RS:FindFirstChild("Packages")
-    if net then
-        net = net:FindFirstChild("Net")
-    end
-    
-    if not net then
-        setStatus("Searching for remote...", Color3.fromRGB(200, 200, 50))
-        -- Durchsuche RS
-        local function scan(p)
-            for _, c in ipairs(p:GetChildren()) do
-                if c:IsA("RemoteEvent") and not hooked then
-                    c.OnClientEvent:Connect(function(a)
-                        if type(a) == "string" and #a > 0 then
-                            pasteCode(a)
-                        end
-                    end)
-                    hooked = true
-                    setStatus("Listening!", Color3.fromRGB(80, 255, 120))
-                    return
-                end
-                scan(c)
-            end
-        end
-        scan(RS)
-        return
-    end
-    
     local function scan(p)
         for _, c in ipairs(p:GetChildren()) do
             if c:IsA("RemoteEvent") and not hooked then
@@ -709,7 +753,16 @@ task.spawn(function()
             scan(c)
         end
     end
-    scan(net)
+    
+    local net = RS:FindFirstChild("Packages")
+    if net then
+        net = net:FindFirstChild("Net")
+    end
+    if net then
+        scan(net)
+    else
+        scan(RS)
+    end
 end)
 
 updateWords()
