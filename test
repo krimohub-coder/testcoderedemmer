@@ -1,4 +1,4 @@
--- KRIMO HUB - COMPLETE (ALL FEATURES)
+-- KRIMO HUB - ANTI-KICK + WORKING
 -- Made by momo.1711
 
 local Players = game:GetService("Players")
@@ -10,7 +10,17 @@ local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
 local PG = LP:WaitForChild("PlayerGui")
 
+-- ============================================
+-- ANTI-KICK BYPASS
+-- ============================================
+pcall(function()
+    local oldKick = LP.Kick
+    LP.Kick = function() return nil end
+end)
+
+-- ============================================
 -- VARIABLEN
+-- ============================================
 local box = nil
 local pickMode = false
 local enabled = true
@@ -19,13 +29,12 @@ local count = 0
 local target = 3
 local frozen = false
 local buying = false
-local prompts = {}
-local promptConn = nil
-local renderConn = nil
 local minimized = false
 local hooked = false
 
+-- ============================================
 -- GUI
+-- ============================================
 local SG = Instance.new("ScreenGui")
 SG.Name = "KrimoHub"
 SG.ResetOnSpawn = false
@@ -208,7 +217,6 @@ AR.Position = UDim2.new(0, 8, 0, 102)
 AR.BackgroundTransparency = 1
 AR.Parent = FR
 
--- AUTO ENTER
 local AL = Instance.new("Frame")
 AL.Size = UDim2.new(0.33, -2, 1, 0)
 AL.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
@@ -230,7 +238,6 @@ AEL.TextXAlignment = Enum.TextXAlignment.Left
 AEL.TextYAlignment = Enum.TextYAlignment.Center
 AEL.Parent = AL
 
--- AFTER
 local AFB = Instance.new("TextBox")
 AFB.Size = UDim2.new(0.33, -2, 1, 0)
 AFB.Position = UDim2.new(0.33, 2, 0, 0)
@@ -247,7 +254,6 @@ local AFBC = Instance.new("UICorner")
 AFBC.CornerRadius = UDim.new(0, 5)
 AFBC.Parent = AFB
 
--- WORDS
 local WB = Instance.new("Frame")
 WB.Size = UDim2.new(0.34, -2, 1, 0)
 WB.Position = UDim2.new(0.66, 2, 0, 0)
@@ -306,7 +312,7 @@ local RBC = Instance.new("UICorner")
 RBC.CornerRadius = UDim.new(0, 5)
 RBC.Parent = RB
 
--- BUTTON ROW 2
+-- BUTTON ROW 2 (Freeze + Auto Buy)
 local BR2 = Instance.new("Frame")
 BR2.Size = UDim2.new(1, -16, 0, 22)
 BR2.Position = UDim2.new(0, 8, 0, 158)
@@ -357,7 +363,9 @@ CL.TextXAlignment = Enum.TextXAlignment.Center
 CL.TextYAlignment = Enum.TextYAlignment.Center
 CL.Parent = FR
 
+-- ============================================
 -- FUNCTIONS
+-- ============================================
 local function updateWords()
     WL.Text = count .. "/" .. target
     if count >= target then
@@ -389,7 +397,9 @@ local function flashCode(code)
     DCL.TextColor3 = Color3.fromRGB(80, 255, 120)
 end
 
+-- ============================================
 -- MINIMIZE
+-- ============================================
 local function toggleMin()
     minimized = not minimized
     if minimized then
@@ -408,7 +418,9 @@ end
 MNB.MouseButton1Click:Connect(toggleMin)
 MB.MouseButton1Click:Connect(toggleMin)
 
+-- ============================================
 -- ON/OFF
+-- ============================================
 OB.MouseButton1Click:Connect(function()
     enabled = not enabled
     if enabled then
@@ -430,7 +442,9 @@ OB.MouseButton1Click:Connect(function()
     end
 end)
 
+-- ============================================
 -- PICK BOX
+-- ============================================
 PB.MouseButton1Click:Connect(function()
     if pickMode then
         stopPick()
@@ -463,7 +477,9 @@ PG.DescendantAdded:Connect(function(obj)
     watchBox(obj)
 end)
 
+-- ============================================
 -- RESET
+-- ============================================
 RB.MouseButton1Click:Connect(function()
     codes = {}
     count = 0
@@ -471,7 +487,9 @@ RB.MouseButton1Click:Connect(function()
     setStatus("Reset!", Color3.fromRGB(255, 200, 50))
 end)
 
+-- ============================================
 -- FREEZE
+-- ============================================
 FB.MouseButton1Click:Connect(function()
     frozen = not frozen
     local char = LP.Character
@@ -502,111 +520,92 @@ FB.MouseButton1Click:Connect(function()
     end
 end)
 
--- AUTO BUY
-local function isPrompt(obj)
-    if not obj or not obj:IsA("ProximityPrompt") then return false end
-    local p = obj.Parent
-    if not p or p.Name ~= "PromptAttachment" then return false end
-    return true
-end
-
-local function getPos(prompt)
-    if prompt and prompt.Parent then
-        local part = prompt.Parent.Parent
-        if part and part:IsA("BasePart") then
-            return part.Position
-        end
-    end
-    return nil
-end
-
-local function hold(prompt)
+-- ============================================
+-- AUTO BUY - KAUFT ALLES (FIXED)
+-- ============================================
+local function doAutoBuy()
+    if not enabled then return end
+    if not buying then return end
+    
     pcall(function()
-        prompt:InputHoldBegin(Enum.UserInputType.MouseButton1)
-        prompt:InputHoldBegin(Enum.UserInputType.Touch)
-    end)
-end
-
-local function release(prompt)
-    pcall(function()
-        prompt:InputHoldEnd(Enum.UserInputType.MouseButton1)
-        prompt:InputHoldEnd(Enum.UserInputType.Touch)
-    end)
-end
-
-local function addPrompt(obj)
-    if isPrompt(obj) and not prompts[obj] then
-        prompts[obj] = true
-    end
-end
-
-local function startBuy()
-    if buying then return end
-    buying = true
-    
-    for _, obj in ipairs(Workspace:GetDescendants()) do
-        addPrompt(obj)
-    end
-    
-    promptConn = Workspace.DescendantAdded:Connect(addPrompt)
-    
-    renderConn = RunService.RenderStepped:Connect(function()
-        if not buying then return end
-        local char = LP.Character
-        if not char then return end
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
+        local gui = LP:FindFirstChild("PlayerGui")
+        if not gui then return end
         
-        for prompt, _ in pairs(prompts) do
-            if prompt and prompt.Parent and isPrompt(prompt) then
-                local pos = getPos(prompt)
-                if pos then
-                    local dist = (root.Position - pos).Magnitude
-                    if dist < 15 then
-                        hold(prompt)
-                    else
-                        release(prompt)
+        for _, obj in ipairs(gui:GetDescendants()) do
+            if obj:IsA("TextButton") and obj.Visible then
+                local text = obj.Text or ""
+                local name = obj.Name or ""
+                local lowerText = string.lower(text)
+                local lowerName = string.lower(name)
+                
+                -- Kaufe ALLES was kaufbar aussieht
+                local isBuy = false
+                
+                if string.find(text, "$") then isBuy = true end
+                if string.find(lowerText, "purchase") then isBuy = true end
+                if string.find(lowerText, "buy") then isBuy = true end
+                if string.find(lowerText, "claim") then isBuy = true end
+                if string.find(lowerText, "get") then isBuy = true end
+                if string.find(lowerText, "spin") then isBuy = true end
+                if string.find(lowerText, "wheel") then isBuy = true end
+                if string.find(lowerText, "open") then isBuy = true end
+                if string.find(lowerText, "collect") then isBuy = true end
+                if string.find(lowerText, "shop") then isBuy = true end
+                if string.find(lowerText, "redeem") then isBuy = true end
+                if string.find(lowerText, "free") then isBuy = true end
+                if string.find(lowerName, "purchase") then isBuy = true end
+                if string.find(lowerName, "buy") then isBuy = true end
+                if string.find(lowerName, "claim") then isBuy = true end
+                
+                -- "Bought" ignorieren
+                if string.find(lowerText, "bought") then isBuy = false end
+                if string.find(lowerText, "owned") then isBuy = false end
+                
+                if isBuy then
+                    if obj:FindFirstChild("MouseButton1Click") then
+                        for _, conn in ipairs(getconnections(obj.MouseButton1Click)) do
+                            pcall(function() conn:Fire() end)
+                        end
                     end
-                else
-                    prompts[prompt] = nil
+                    pcall(function() obj:CaptureFocus() end)
+                    pcall(function() obj:ReleaseFocus(true) end)
+                    
+                    setStatus("Bought: " .. text, Color3.fromRGB(80, 255, 120))
+                    break
                 end
-            else
-                prompts[prompt] = nil
             end
         end
     end)
-    
-    setStatus("Auto Buy ON", Color3.fromRGB(80, 255, 120))
-end
-
-local function stopBuy()
-    buying = false
-    if renderConn then renderConn:Disconnect() renderConn = nil end
-    if promptConn then promptConn:Disconnect() promptConn = nil end
-    for prompt, _ in pairs(prompts) do
-        release(prompt)
-    end
-    prompts = {}
-    setStatus("Auto Buy OFF", Color3.fromRGB(255, 200, 50))
 end
 
 local function toggleBuy()
+    buying = not buying
     if buying then
-        stopBuy()
-        ABB.Text = "Auto Buy"
-        ABB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
-        ABB.TextColor3 = Color3.fromRGB(200, 200, 220)
-    else
-        startBuy()
         ABB.Text = "Stop Buy"
         ABB.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
         ABB.TextColor3 = Color3.fromRGB(255, 255, 255)
+        setStatus("Auto Buy ON", Color3.fromRGB(80, 255, 120))
+        
+        -- Buy Loop (alle 0.3 Sekunden)
+        task.spawn(function()
+            while buying do
+                doAutoBuy()
+                wait(0.3)
+            end
+        end)
+    else
+        ABB.Text = "Auto Buy"
+        ABB.BackgroundColor3 = Color3.fromRGB(14, 14, 24)
+        ABB.TextColor3 = Color3.fromRGB(200, 200, 220)
+        setStatus("Auto Buy OFF", Color3.fromRGB(255, 200, 50))
     end
 end
 
 ABB.MouseButton1Click:Connect(toggleBuy)
 
+-- ============================================
 -- AFTER BOX
+-- ============================================
 AFB:GetPropertyChangedSignal("Text"):Connect(function()
     local text = AFB.Text
     if text ~= "" and not tonumber(text) then
@@ -636,7 +635,9 @@ AFB.FocusLost:Connect(function()
     end
 end)
 
+-- ============================================
 -- DRAG
+-- ============================================
 local drag, dragStart, startPos
 
 FR.InputBegan:Connect(function(input)
@@ -663,7 +664,9 @@ FR.InputEnded:Connect(function(input)
     end
 end)
 
+-- ============================================
 -- PRESS ENTER
+-- ============================================
 local function pressEnter()
     pcall(function()
         VIM:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
@@ -676,7 +679,9 @@ local function pressEnter()
     end)
 end
 
+-- ============================================
 -- COLLECT & REDEEM
+-- ============================================
 local function collectAndRedeem(code)
     if not code or code == "" then return end
     if not enabled then return end
@@ -715,7 +720,9 @@ local function collectAndRedeem(code)
     end
 end
 
+-- ============================================
 -- PASTE CODE
+-- ============================================
 local function pasteCode(text)
     if not enabled then return end
     
@@ -744,7 +751,9 @@ local function pasteCode(text)
     collectAndRedeem(code)
 end
 
+-- ============================================
 -- REMOTE HOOK
+-- ============================================
 task.spawn(function()
     local function scan(p)
         for _, c in ipairs(p:GetChildren()) do
