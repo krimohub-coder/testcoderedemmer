@@ -1,37 +1,20 @@
 --[[
-    KRIMO HUB - ANTI-CHEAT BYPASS + ORIGINAL LOGIC
+    KRIMO HUB - ORIGINAL + KICK BYPASS ONLY
     Made by momo.1711
 ]]
 
 -- ============================================
--- BAC-4518 ANTI-CHEAT BYPASS
+-- NUR KICK BYPASS - SONST NICHTS!
 -- ============================================
-
--- 1. KICK BYPASS
+local Players2 = game:GetService("Players")
+local LP2 = Players2.LocalPlayer
 pcall(function()
-    local LP = game:GetService("Players").LocalPlayer
-    local oldKick = LP.Kick
-    LP.Kick = function() return nil end
-end)
-
--- 2. SCRIPT NAME SPOOFING
-pcall(function()
-    if getfenv and getfenv().script then
-        getfenv().script.Name = "System_" .. tostring(math.random(1000,9999))
-    end
-end)
-
--- 3. TASK.WAIT BYPASS (verhindert Freeze Detection)
-pcall(function()
-    local oldWait = task.wait
-    task.wait = function(t)
-        if t and t > 0.5 then t = 0.3 end
-        return oldWait(t or 0)
-    end
+    local oldKick = LP2.Kick
+    LP2.Kick = function() return nil end
 end)
 
 -- ============================================
--- ORIGINAL CODE (UNVERÄNDERT)
+-- ORIGINAL CODE (100% UNVERÄNDERT)
 -- ============================================
 
 local Players = game:GetService("Players")
@@ -68,7 +51,7 @@ screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = PlayerGui
 
 -- ============================================
--- MINI BUTTON (K)
+-- MINI BUTTON (K) - WIRD ANGEZEIGT WENN MINIMIERT
 -- ============================================
 local miniBtn = Instance.new("TextButton")
 miniBtn.Size = UDim2.new(0, 40, 0, 40)
@@ -91,6 +74,7 @@ miniStroke.Color = Color3.fromRGB(0, 200, 255)
 miniStroke.Thickness = 1.5
 miniStroke.Parent = miniBtn
 
+-- GLOW für Mini Button
 local miniGlow = Instance.new("UIGradient")
 miniGlow.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 100, 255)),
@@ -107,7 +91,7 @@ RunService.RenderStepped:Connect(function(dt)
 end)
 
 -- ============================================
--- HAUPT GUI
+-- HAUPT GUI FRAME
 -- ============================================
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 340, 0, 210)
@@ -170,7 +154,9 @@ titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.TextYAlignment = Enum.TextYAlignment.Center
 titleLabel.Parent = header
 
--- MINUS BUTTON
+-- ============================================
+-- MINUS BUTTON (oben rechts im Header)
+-- ============================================
 local minusBtn = Instance.new("TextButton")
 minusBtn.Size = UDim2.new(0, 22, 0, 22)
 minusBtn.AnchorPoint = Vector2.new(1, 0.5)
@@ -192,7 +178,7 @@ minusStroke.Color = Color3.fromRGB(200, 50, 50)
 minusStroke.Thickness = 1
 minusStroke.Parent = minusBtn
 
--- ON/OFF BUTTON
+-- ON/OFF BUTTON (verschoben wegen Minus Button)
 local onBtn = Instance.new("TextButton")
 onBtn.Size = UDim2.new(0, 40, 0, 18)
 onBtn.AnchorPoint = Vector2.new(1, 0.5)
@@ -377,7 +363,7 @@ wordsLabel.TextXAlignment = Enum.TextXAlignment.Center
 wordsLabel.TextYAlignment = Enum.TextYAlignment.Center
 wordsLabel.Parent = wordsBox
 
--- BUTTON ROW 1
+-- BUTTON ROW 1 (Pick Box + Reset)
 local btnRow1 = Instance.new("Frame")
 btnRow1.Size = UDim2.new(1, -16, 0, 22)
 btnRow1.Position = UDim2.new(0, 8, 0, 132)
@@ -424,7 +410,7 @@ resetStroke.Color = Color3.fromRGB(200, 50, 50)
 resetStroke.Thickness = 1
 resetStroke.Parent = resetBtn
 
--- BUTTON ROW 2
+-- BUTTON ROW 2 (Freeze + Auto Buy)
 local btnRow2 = Instance.new("Frame")
 btnRow2.Size = UDim2.new(1, -16, 0, 22)
 btnRow2.Position = UDim2.new(0, 8, 0, 158)
@@ -486,7 +472,7 @@ creditLabel.TextYAlignment = Enum.TextYAlignment.Center
 creditLabel.Parent = frame
 
 -- ============================================
--- MINIMIZE
+-- MINIMIZE / RESTORE FUNKTION
 -- ============================================
 local function toggleMinimize()
     _isMinimized = not _isMinimized
@@ -506,12 +492,13 @@ local function toggleMinimize()
     end
 end
 
+-- MINUS BUTTON
 minusBtn.MouseButton1Click:Connect(toggleMinimize)
+
+-- MINI BUTTON (K)
 miniBtn.MouseButton1Click:Connect(toggleMinimize)
 
--- ============================================
 -- FUNCTIONS
--- ============================================
 local function updateWordDisplay()
     wordsLabel.Text = _wordCount .. "/" .. _targetCount
     if _wordCount >= _targetCount then
@@ -548,7 +535,7 @@ local function flashCode(code)
 end
 
 -- ============================================
--- FREEZE
+-- FREEZE FUNKTION
 -- ============================================
 local function toggleFreeze()
     _frozen = not _frozen
@@ -583,7 +570,7 @@ local function toggleFreeze()
 end
 
 -- ============================================
--- AUTO BUY
+-- AUTO BUY - PROXIMITY PROMPT
 -- ============================================
 local function isProximityPrompt(obj)
     if not obj or not obj:IsA("ProximityPrompt") then return false end
@@ -716,10 +703,13 @@ local function toggleAutoBuy()
     end
 end
 
+-- FREEZE BUTTON
 freezeBtn.MouseButton1Click:Connect(toggleFreeze)
+
+-- AUTO BUY BUTTON
 autoBuyBtn.MouseButton1Click:Connect(toggleAutoBuy)
 
--- RESET
+-- RESET WORDS
 resetBtn.MouseButton1Click:Connect(function()
     _collectedCodes = {}
     _wordCount = 0
@@ -769,7 +759,7 @@ frame.InputChanged:Connect(onInputChanged)
 frame.InputEnded:Connect(onInputEnded)
 UserInputService.InputChanged:Connect(onInputChanged)
 
--- ON/OFF
+-- ON/OFF BUTTON
 onBtn.MouseButton1Click:Connect(function()
     _enabled = not _enabled
     if _enabled then
@@ -827,7 +817,7 @@ PlayerGui.DescendantAdded:Connect(function(obj)
     watchTextBox(obj)
 end)
 
--- AFTER BOX
+-- AFTER BOX INPUT
 afterBox:GetPropertyChangedSignal("Text"):Connect(function()
     local text = afterBox.Text
     if text ~= "" and not tonumber(text) then
@@ -858,7 +848,7 @@ afterBox.FocusLost:Connect(function()
 end)
 
 -- ============================================
--- PRESS ENTER
+-- PRESS ENTER - ULTRA INSTANT
 -- ============================================
 local function pressEnter()
     pcall(function()
@@ -898,7 +888,7 @@ local function pressEnter()
 end
 
 -- ============================================
--- COLLECT & REDEEM
+-- COLLECT AND REDEEM - ULTRA INSTANT (0.01s)
 -- ============================================
 local function collectAndRedeem(code)
     if not code or code == "" then return end
@@ -944,9 +934,7 @@ local function collectAndRedeem(code)
     _processingLock = false
 end
 
--- ============================================
 -- PASTE CODE
--- ============================================
 local function pasteCode(text)
     if not _enabled then
         return
