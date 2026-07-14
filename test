@@ -1,32 +1,6 @@
---[[
-    KRIMO HUB - ULTIMATE (ORIGINAL GUI + ANTI-CHEAT)
-    Made by momo.1711
-]]
+-- KRIMO HUB - COMPLETE (ALL FEATURES + BEAUTIFUL GUI)
+-- Made by momo.1711
 
--- ============================================
--- ANTI-CHEAT BYPASS (UNSICHTBAR)
--- ============================================
-local function antiCheatBypass()
-    -- Verstecke den Script vor Anti-Cheat
-    pcall(function()
-        if getfenv and getfenv().script then
-            getfenv().script.Name = "System_" .. tostring(math.random(1000,9999))
-        end
-    end)
-    
-    -- Deaktiviere Debug (falls möglich)
-    pcall(function()
-        if debug and debug.setmetatable then
-            debug.setmetatable(game, {})
-            debug.setmetatable(workspace, {})
-        end
-    end)
-end
-pcall(antiCheatBypass)
-
--- ============================================
--- SERVICES
--- ============================================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -34,8 +8,11 @@ local RS = game:GetService("ReplicatedStorage")
 local VIM = game:GetService("VirtualInputManager")
 local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
-local PG = LP:FindFirstChild("PlayerGui") or LP:WaitForChild("PlayerGui")
+local PG = LP:WaitForChild("PlayerGui")
 
+-- ============================================
+-- VARIABLEN
+-- ============================================
 local box = nil
 local pickMode = false
 local enabled = true
@@ -48,34 +25,16 @@ local prompts = {}
 local promptConn = nil
 local renderConn = nil
 local minimized = false
-local hooked = false
 
 -- ============================================
--- RANDOM GUI NAME
--- ============================================
-local guiName = ""
-for i = 1, 8 do
-    guiName = guiName .. string.char(math.random(97, 122))
-end
-
--- ============================================
--- ORIGINAL SCHÖNE GUI
+-- SCHÖNE GUI
 -- ============================================
 local SG = Instance.new("ScreenGui")
-SG.Name = guiName
+SG.Name = "KrimoHub"
 SG.ResetOnSpawn = false
 SG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 SG.DisplayOrder = 999
-
--- Versuche CoreGui (weniger detektierbar)
-local ok = pcall(function()
-    SG.Parent = game:GetService("CoreGui")
-end)
-if not ok then
-    pcall(function()
-        SG.Parent = PG
-    end)
-end
+SG.Parent = PG
 
 -- MAIN FRAME
 local FR = Instance.new("Frame")
@@ -83,7 +42,6 @@ FR.Size = UDim2.new(0, 340, 0, 210)
 FR.Position = UDim2.new(1, -350, 0, 10)
 FR.BackgroundColor3 = Color3.fromRGB(8, 8, 16)
 FR.BorderSizePixel = 0
-FR.BackgroundTransparency = 0.05
 FR.Parent = SG
 
 local FRC = Instance.new("UICorner")
@@ -93,7 +51,7 @@ FRC.Parent = FR
 local FRS = Instance.new("UIStroke")
 FRS.Color = Color3.fromRGB(0, 180, 255)
 FRS.Thickness = 1.2
-FRS.Transparency = 0.5
+FRS.Transparency = 0.3
 FRS.Parent = FR
 
 -- GLOW
@@ -131,7 +89,7 @@ MBC.Parent = MB
 local MBS = Instance.new("UIStroke")
 MBS.Color = Color3.fromRGB(0, 200, 255)
 MBS.Thickness = 1.5
-MBS.Transparency = 0.5
+MBS.Transparency = 0.3
 MBS.Parent = MB
 
 -- HEADER
@@ -188,7 +146,7 @@ MNBC.Parent = MNB
 local MNBS = Instance.new("UIStroke")
 MNBS.Color = Color3.fromRGB(200, 50, 50)
 MNBS.Thickness = 1
-MNBS.Transparency = 0.5
+MNBS.Transparency = 0.3
 MNBS.Parent = MNB
 
 -- ON/OFF BUTTON
@@ -213,7 +171,7 @@ OBC.Parent = OB
 local OBS = Instance.new("UIStroke")
 OBS.Color = Color3.fromRGB(60, 220, 90)
 OBS.Thickness = 1
-OBS.Transparency = 0.5
+OBS.Transparency = 0.3
 OBS.Parent = OB
 
 -- STATUS
@@ -436,7 +394,7 @@ RBC.Parent = RB
 local RBS = Instance.new("UIStroke")
 RBS.Color = Color3.fromRGB(200, 50, 50)
 RBS.Thickness = 1
-RBS.Transparency = 0.5
+RBS.Transparency = 0.3
 RBS.Parent = RB
 
 -- BUTTON ROW 2
@@ -505,7 +463,7 @@ CL.TextYAlignment = Enum.TextYAlignment.Center
 CL.Parent = FR
 
 -- ============================================
--- FUNCTIONS (WIE VORHER)
+-- FUNCTIONS
 -- ============================================
 local function updateWords()
     WL.Text = count .. "/" .. target
@@ -865,7 +823,7 @@ FR.InputEnded:Connect(function(input)
 end)
 
 -- ============================================
--- PRESS ENTER (OHNE getconnections)
+-- PRESS ENTER (OHNE getconnections!)
 -- ============================================
 local function pressEnter()
     pcall(function()
@@ -955,8 +913,10 @@ local function pasteCode(text)
 end
 
 -- ============================================
--- REMOTE HOOK (EINFACH & SICHER)
+-- REMOTE HOOK
 -- ============================================
+local hooked = false
+
 task.spawn(function()
     local ok, net = pcall(function()
         return RS:WaitForChild("Packages", 10):WaitForChild("Net", 10)
